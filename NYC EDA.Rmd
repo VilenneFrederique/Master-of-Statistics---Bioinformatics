@@ -1,0 +1,48 @@
+---
+title: "NYC taxi trips EDA"
+author: "Vilenne Frédérique"
+date: "2-10-2021"
+output: html_document
+---
+
+# Reading the data
+
+```{r }
+train <- read.csv("train.csv")
+```
+
+# Loading libraries
+
+```{r}
+library(tidyverse)
+library(leaflet)
+library(skimr)
+```
+
+# Summary statistics
+## Vendor
+Looking at how often we had vendor 1 and vendor 2. Seems like vendor 2 was chosen quite more often. Namely 101960 times. This could be quite significant when modelling. Might want to be something we want to account for.  
+```{r}
+train %>% count(factor(vendor_id)) -> vendor_count
+vendor_count[[2,2]] - vendor_count[[1,2]]
+```
+
+
+It seems like vendor made some long-ass trips. Filtering out these outliers. 
+```{r}
+train %>% ggplot(aes(x = factor(vendor_id), y = trip_duration / 60, colour = factor(vendor_id))) + geom_boxplot() + geom_jitter(alpha = 0.5)
+```
+
+
+It looks like vendor 1 made shorter trips than vendor 2 after removing those outliers. 
+```{r}
+train %>% filter((trip_duration / 60) < 20000 ) %>% ggplot(aes(x = factor(vendor_id), y = trip_duration / 60, colour = factor(vendor_id))) + geom_boxplot() + geom_jitter(alpha = 0.5)
+```
+
+
+
+```{r}
+train_leaflet <- sf::read
+train %>% leaflet() %>% addPolygons()
+```
+
